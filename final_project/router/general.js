@@ -80,4 +80,95 @@ public_users.get('/review/:isbn',function (req, res) {
     }
 });
 
+// Get the book list available in the shop using Promise callback
+public_users.get('/async/books', function (req, res) {
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(books)
+        }, 100);
+    })
+    .then(books => {
+        res.status(200).send(books);
+    })
+    .catch(() => {
+        res.status(404).send({ message: "Books not found" });
+    });
+});
+
+// Get the book from ISBN in the shop using Promise callback
+public_users.get('/async/isbn/:isbn', function (req, res) {
+    const isbn = req.params.isbn;
+
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const book = books[isbn];
+            if (book) {
+                resolve(book);
+            } else {
+                return reject(new Error("No books found matching criteria"));
+            }
+        }, 100);
+    })
+    .then(book => {
+        res.status(200).send(book);
+    })
+    .catch(() => {
+        res.status(404).send({ message: "No books found matching criteria" });
+    });
+});
+
+// Get the books from author in the shop using Promise callback
+public_users.get('/async/author/:author', function (req, res) {
+    const author = req.params.author;
+
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let filtered_books = [];
+            
+            for (let isbn in books) {
+                if (books[isbn].author == author) {
+                    filtered_books.push(books[isbn]);
+                }
+            }
+            if (filtered_books.length == 0) {
+                return reject(new Error("No books found"));
+            }
+            resolve(filtered_books);
+        }, 100);
+    })
+    .then(filtered_books => {
+        res.status(200).send(filtered_books);
+    })
+    .catch(() => {
+        res.status(404).send({ message: "No books found matching criteria" });
+    });
+});
+
+// Get the books from title in the shop using Promise callback
+public_users.get('/async/title/:title', function (req, res) {
+    const title = req.params.title;
+
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let filtered_books = [];
+            
+            for (let isbn in books) {
+                if (books[isbn].title == title) {
+                    filtered_books.push(books[isbn]);
+                }
+            }
+            if (filtered_books.length == 0) {
+                return reject(new Error("No books found"));
+            }
+            resolve(filtered_books);
+        }, 100);
+    })
+    .then(filtered_books => {
+        res.status(200).send(filtered_books);
+    })
+    .catch(() => {
+        res.status(404).send({ message: "No books found matching criteria" });
+    });
+});
+
 module.exports.general = public_users;
